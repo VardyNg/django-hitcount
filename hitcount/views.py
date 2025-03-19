@@ -8,6 +8,8 @@ from django.views.generic import View, DetailView
 from hitcount.utils import get_ip
 from hitcount.models import Hit, BlacklistIP, BlacklistUserAgent
 from hitcount.utils import RemovedInHitCount13Warning, get_hitcount_model
+from django.db.models import Value, IntegerField
+from django.db.models.functions import Cast
 
 
 class HitCountMixin:
@@ -157,7 +159,8 @@ class HitCountDetailView(DetailView, HitCountMixin):
                 context['hitcount']['hit_counted'] = hit_count_response.hit_counted
                 context['hitcount']['hit_message'] = hit_count_response.hit_message
 
-            context['hitcount']['total_hits'] = hits
+            # Explicitly cast non-integer constants to integers
+            context['hitcount']['total_hits'] = Cast(Value(hits), IntegerField())
 
         return context
 
